@@ -98,8 +98,8 @@ export const CartDrawer: React.FC = () => {
 
           {step === 'checkout' && (
             <form onSubmit={handleCheckoutSubmit} className="space-y-4">
-              <div className="bg-rose-50 text-rose-900 p-3 rounded-2xl text-xs font-bold">
-                ✓ Includes Free Home Sample Collection & Barcoded Tube Pickups.
+              <div className="bg-emerald-50 text-emerald-800 p-3 rounded-2xl text-xs font-bold border border-emerald-200">
+                ⚡ Direct Guest Booking: No login or account required.
               </div>
 
               <div>

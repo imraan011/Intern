@@ -7,7 +7,7 @@ export const BookTestView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const categories = ['All', 'Hematology', 'Diabetes', 'Cardiology', 'Thyroid', 'Liver', 'Kidney', 'Bone & Joint'];
+  const categories = ['All', 'Hematology', 'Diabetes', 'Cardiology', 'Thyroid', 'Liver', 'Kidney', 'Bone & Joint', 'Fever Profile', 'Oncology', 'Pregnancy', 'Allergy'];
 
   const filteredTests = TESTS_DATA.filter((test) => {
     const matchesCategory = selectedCategory === 'All' || test.category === selectedCategory;

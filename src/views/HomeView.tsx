@@ -43,6 +43,8 @@ export const HomeView: React.FC<HomeProps> = ({ onNavigate, onOpenReportModal })
     { name: 'Thyroid', id: 'thyroid', icon: 'vital_signs' },
     { name: 'Diabetes', id: 'diabetes', icon: 'bloodtype' },
     { name: 'Bone & Joint', id: 'bone', icon: 'accessibility' },
+    { name: 'Fever Profile', id: 'fever', icon: 'thermostat' },
+    { name: 'Pregnancy', id: 'pregnancy', icon: 'pregnant_woman' },
   ];
 
   const imagingScans = [
@@ -53,8 +55,8 @@ export const HomeView: React.FC<HomeProps> = ({ onNavigate, onOpenReportModal })
     { title: 'DEXA Scan', tag: 'Bone Density Metric', icon: 'monitor_weight' },
   ];
 
-  const cityChips = ['Delhi', 'Noida', 'Gurugram', 'Ghaziabad', 'Lucknow', 'Patna', 'Kolkata', 'Bengaluru'];
-  const specChips = ['Cardiologist', 'Dermatologist', 'Gynaecologist', 'Gastroenterologist', 'Endocrinologist', 'General Physician'];
+  const cityChips = ['Delhi', 'Noida', 'Gurugram', 'Lucknow', 'Varanasi', 'Patna', 'Kolkata', 'Mumbai', 'Pune', 'Bengaluru', 'Hyderabad', 'Chennai', 'Jaipur'];
+  const specChips = ['Cardiologist', 'Dermatologist', 'Gynaecologist', 'Gastroenterologist', 'Endocrinologist', 'Neurologist', 'Oncologist', 'General Physician', 'Nephrologist', 'Pediatrician', 'Pulmonologist', 'Orthopedic Specialist'];
 
   return (
     <div className="space-y-16 pb-12">

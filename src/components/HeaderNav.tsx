@@ -18,7 +18,18 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   const { setIsCartOpen, totalCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const states = ['Delhi NCR', 'Uttar Pradesh', 'Bihar', 'West Bengal', 'Karnataka'];
+  const states = [
+    'Delhi NCR',
+    'Uttar Pradesh',
+    'Bihar',
+    'West Bengal',
+    'Maharashtra',
+    'Karnataka',
+    'Telangana',
+    'Tamil Nadu',
+    'Gujarat',
+    'Rajasthan'
+  ];
 
   const handleNavClick = (page: PageView) => {
     onNavigate(page);

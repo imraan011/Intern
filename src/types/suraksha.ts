@@ -15,7 +15,7 @@ export interface TestItem {
   code: string;
   category: string;
   sampleType: string;
-  tat: string; // e.g. "Same Day"
+  tat: string;
   fasting: string;
   price: number;
   originalPrice: number;
@@ -25,7 +25,7 @@ export interface TestItem {
 export interface PackageItem {
   id: string;
   name: string;
-  concern: 'heart' | 'liver' | 'kidney' | 'thyroid' | 'diabetes' | 'bone' | 'senior' | 'women';
+  concern: string;
   gender: 'all' | 'female' | 'male';
   ageGroup: string;
   testCount: number;
