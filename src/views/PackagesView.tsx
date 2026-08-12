@@ -41,7 +41,7 @@ export const PackagesView: React.FC<PackagesViewProps> = ({ initialFilter }) => 
               Filter by Concern
             </h3>
             <div className="space-y-2 text-xs font-bold text-slate-700">
-              {['all', 'heart', 'diabetes', 'women', 'senior', 'liver', 'kidney', 'bone'].map((c) => (
+              {['all', 'heart', 'diabetes', 'women', 'senior', 'fever', 'pregnancy', 'liver', 'kidney', 'bone'].map((c) => (
                 <label key={c} className="flex items-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 cursor-pointer">
                   <input
                     type="radio"

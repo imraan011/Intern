@@ -12,7 +12,7 @@ export const ConsultDoctorView: React.FC<DoctorViewProps> = ({ onSuccessToast })
   const [selectedDay, setSelectedDay] = useState<string>('Mon');
   const [selectedTime, setSelectedTime] = useState<string>('10:30 AM');
 
-  const specializations = ['All', 'Cardiologist', 'Dermatologist', 'Gastroenterologist', 'Gynaecologist'];
+  const specializations = ['All', 'Cardiologist', 'Dermatologist', 'Gastroenterologist', 'Gynaecologist', 'Endocrinologist', 'Neurologist', 'Oncologist', 'General Physician', 'Nephrologist', 'Pediatrician', 'Pulmonologist', 'Orthopedic Specialist'];
 
   const filteredDoctors = DOCTORS_DATA.filter((doc) => {
     return selectedSpec === 'All' || doc.specialization === selectedSpec;
