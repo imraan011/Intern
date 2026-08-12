@@ -1,106 +1,110 @@
 import React, { useState } from 'react';
-import { NavTab } from './types';
-import { Header } from './components/Header';
-import { Footer } from './components/Footer';
-import { HomeView } from './components/HomeView';
-import { SolutionsView } from './components/SolutionsView';
-import { ServicesView } from './components/ServicesView';
-import { PortalView } from './components/PortalView';
-import { BookingModal } from './components/BookingModal';
-import { WellnessQuizModal } from './components/WellnessQuizModal';
-import { VideoModal } from './components/VideoModal';
+import { SurakshaHeader } from './components/SurakshaHeader';
+import { SurakshaHero } from './components/SurakshaHero';
+import { TestCategories } from './components/TestCategories';
+import { TechStrip } from './components/TechStrip';
+import { StatsCounter } from './components/StatsCounter';
+import { TestimonialsSection } from './components/TestimonialsSection';
+import { FindCentreSection } from './components/FindCentreSection';
+import { SurakshaFooter } from './components/SurakshaFooter';
+import { BookTestModal } from './components/BookTestModal';
+import { DownloadReportModal } from './components/DownloadReportModal';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { MobileStickyBar } from './components/MobileStickyBar';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<NavTab>('home');
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [bookingDoctor, setBookingDoctor] = useState<string | undefined>();
-  const [quizOpen, setQuizOpen] = useState(false);
-  const [videoOpen, setVideoOpen] = useState(false);
+  const [bookModalOpen, setBookModalOpen] = useState(false);
+  const [bookType, setBookType] = useState<'test' | 'homeCollection'>('test');
+  const [prefilledTest, setPrefilledTest] = useState<string>('');
+  const [reportModalOpen, setReportModalOpen] = useState(false);
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 4000);
+    setTimeout(() => setToastMessage(null), 4500);
   };
 
-  const handleOpenBooking = (docName?: string) => {
-    setBookingDoctor(docName);
-    setBookingOpen(true);
+  const handleOpenBookModal = (type: 'test' | 'homeCollection' = 'test', testName: string = '') => {
+    setBookType(type);
+    setPrefilledTest(testName);
+    setBookModalOpen(true);
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background text-on-surface flex flex-col font-sans selection:bg-primary-container selection:text-on-primary-container">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-brand-700 selection:text-white">
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-[250] bg-on-surface text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs font-semibold animate-bounce">
-          <span className="material-symbols-outlined text-emerald-400">
-            check_circle
-          </span>
+        <div className="fixed top-20 right-4 sm:right-6 z-[250] bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-xs sm:text-sm font-bold border border-slate-700 animate-bounce">
+          <span className="material-symbols-outlined text-emerald-400">check_circle</span>
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Header (Hidden on Portal tab) */}
-      <Header
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onOpenBooking={() => handleOpenBooking()}
+      {/* Sticky Header */}
+      <SurakshaHeader
+        onOpenBookModal={(type) => handleOpenBookModal(type)}
+        onOpenReportModal={() => setReportModalOpen(true)}
+        onScrollToSection={scrollToSection}
       />
 
-      {/* Main Content */}
+      {/* Main Sections */}
       <main className="flex-1">
-        {activeTab === 'home' && (
-          <HomeView
-            onOpenBooking={() => handleOpenBooking()}
-            onOpenVideo={() => setVideoOpen(true)}
-            onNavigate={(tab) => setActiveTab(tab)}
-          />
-        )}
+        <SurakshaHero
+          onOpenBookModal={(type) => handleOpenBookModal(type)}
+          onScrollToSection={scrollToSection}
+        />
 
-        {activeTab === 'solutions' && (
-          <SolutionsView
-            onOpenBooking={() => handleOpenBooking()}
-            onOpenVideo={() => setVideoOpen(true)}
-            onNavigate={(tab) => setActiveTab(tab)}
-          />
-        )}
+        <TestCategories
+          onSelectTestToBook={(testName) => handleOpenBookModal('test', testName)}
+        />
 
-        {activeTab === 'services' && (
-          <ServicesView
-            onOpenBooking={() => handleOpenBooking()}
-            onOpenVideo={() => setVideoOpen(true)}
-          />
-        )}
+        <TechStrip />
 
-        {activeTab === 'portal' && (
-          <PortalView
-            onOpenBooking={() => handleOpenBooking()}
-            onNavigateHome={() => setActiveTab('home')}
-          />
-        )}
+        <StatsCounter />
+
+        <TestimonialsSection />
+
+        <FindCentreSection
+          onOpenBookModal={(type) => handleOpenBookModal(type)}
+        />
       </main>
 
-      {/* Footer (Hidden on Portal tab) */}
-      {activeTab !== 'portal' && (
-        <Footer onNavigate={(tab) => setActiveTab(tab)} />
-      )}
+      {/* Footer */}
+      <SurakshaFooter
+        onOpenBookModal={() => handleOpenBookModal('test')}
+        onOpenReportModal={() => setReportModalOpen(true)}
+        onScrollToSection={scrollToSection}
+      />
 
-      {/* Interactive Modals */}
-      <BookingModal
-        isOpen={bookingOpen}
-        onClose={() => setBookingOpen(false)}
-        initialDoctor={bookingDoctor}
+      {/* Modals & Sticky Overlays */}
+      <BookTestModal
+        isOpen={bookModalOpen}
+        onClose={() => setBookModalOpen(false)}
+        bookingType={bookType}
+        prefilledTest={prefilledTest}
         onSuccessToast={showToast}
       />
 
-      <WellnessQuizModal
-        isOpen={quizOpen}
-        onClose={() => setQuizOpen(false)}
-        onSelectDoctor={(doc) => handleOpenBooking(doc)}
+      <DownloadReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onSuccessToast={showToast}
       />
 
-      <VideoModal isOpen={videoOpen} onClose={() => setVideoOpen(false)} />
+      <FloatingWhatsApp />
+
+      <MobileStickyBar
+        onOpenBookModal={(type) => handleOpenBookModal(type)}
+        onOpenReportModal={() => setReportModalOpen(true)}
+      />
     </div>
   );
 };
