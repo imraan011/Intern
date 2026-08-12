@@ -430,7 +430,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MD, DM (Neurology)',
     centreName: 'Bandra West Diagnostics Hub',
     city: 'Mumbai',
-    avatar: 'https://images.unsplash.com/photo-1594824813566-78853a152068?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Tue', 'Wed', 'Fri'],
     consultFee: 850
   },
@@ -442,7 +442,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MD, DM (Medical Oncology), ESMO',
     centreName: 'Cyber City Diagnostics Center',
     city: 'Gurugram',
-    avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Mon', 'Wed', 'Sat'],
     consultFee: 1000
   },
@@ -454,7 +454,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MBBS, MD (General Medicine)',
     centreName: 'FC Road Diagnostics',
     city: 'Pune',
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     consultFee: 500
   },
@@ -466,7 +466,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MD, DM (Nephrology)',
     centreName: 'T. Nagar Reference Center',
     city: 'Chennai',
-    avatar: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1638202993928-7267aad84c31?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Wed', 'Fri'],
     consultFee: 850
   },
@@ -478,7 +478,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MD (Pediatrics), DCH',
     centreName: 'Jubilee Hills Care Hub',
     city: 'Hyderabad',
-    avatar: 'https://images.unsplash.com/photo-1594824813566-78853a152068?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1527613426441-4da17471b66d?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Tue', 'Thu', 'Sat'],
     consultFee: 650
   },
@@ -490,7 +490,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MD (Respiratory Medicine), DNB',
     centreName: 'Model Town Diagnostics',
     city: 'Ludhiana',
-    avatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Mon', 'Thu'],
     consultFee: 700
   },
@@ -502,7 +502,7 @@ export const DOCTORS_DATA: Doctor[] = [
     qualification: 'MS (Orthopedics), M.Ch',
     centreName: 'Satellite Diagnostic Center',
     city: 'Ahmedabad',
-    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400',
+    avatar: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?auto=format&fit=crop&q=80&w=400',
     availableDays: ['Tue', 'Fri'],
     consultFee: 750
   }
