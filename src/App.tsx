@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
-import { SurakshaHeader } from './components/SurakshaHeader';
-import { SurakshaHero } from './components/SurakshaHero';
-import { TestCategories } from './components/TestCategories';
-import { TechStrip } from './components/TechStrip';
-import { StatsCounter } from './components/StatsCounter';
-import { TestimonialsSection } from './components/TestimonialsSection';
-import { FindCentreSection } from './components/FindCentreSection';
-import { SurakshaFooter } from './components/SurakshaFooter';
-import { BookTestModal } from './components/BookTestModal';
-import { DownloadReportModal } from './components/DownloadReportModal';
+import { PageView } from './types/suraksha';
+import { CartProvider } from './context/CartContext';
+import { HeaderNav } from './components/HeaderNav';
+import { CartDrawer } from './components/CartDrawer';
+import { CallBackWidget } from './components/CallBackWidget';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { MobileStickyBar } from './components/MobileStickyBar';
+import { Footer } from './components/Footer';
 
-export const App: React.FC = () => {
-  const [bookModalOpen, setBookModalOpen] = useState(false);
-  const [bookType, setBookType] = useState<'test' | 'homeCollection'>('test');
-  const [prefilledTest, setPrefilledTest] = useState<string>('');
-  const [reportModalOpen, setReportModalOpen] = useState(false);
+// Views
+import { HomeView } from './views/HomeView';
+import { BookTestView } from './views/BookTestView';
+import { PackagesView } from './views/PackagesView';
+import { ConsultDoctorView } from './views/ConsultDoctorView';
+import { FindCentreView } from './views/FindCentreView';
+import { DownloadReportView } from './views/DownloadReportView';
+import { AboutView } from './views/AboutView';
+import { BlogView } from './views/BlogView';
+import { ContactView } from './views/ContactView';
+
+export const AppContent: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<PageView>('home');
+  const [packageFilter, setPackageFilter] = useState<string | undefined>();
+  const [selectedState, setSelectedState] = useState<string>('Delhi NCR');
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -25,21 +31,14 @@ export const App: React.FC = () => {
     setTimeout(() => setToastMessage(null), 4500);
   };
 
-  const handleOpenBookModal = (type: 'test' | 'homeCollection' = 'test', testName: string = '') => {
-    setBookType(type);
-    setPrefilledTest(testName);
-    setBookModalOpen(true);
-  };
-
-  const scrollToSection = (sectionId: string) => {
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleNavigate = (page: PageView, filter?: string) => {
+    if (filter) setPackageFilter(filter);
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-brand-700 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-rose-600 selection:text-white">
       {/* Toast Notification Banner */}
       {toastMessage && (
         <div className="fixed top-20 right-4 sm:right-6 z-[250] bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 text-xs sm:text-sm font-bold border border-slate-700 animate-bounce">
@@ -48,63 +47,66 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* Sticky Header */}
-      <SurakshaHeader
-        onOpenBookModal={(type) => handleOpenBookModal(type)}
-        onOpenReportModal={() => setReportModalOpen(true)}
-        onScrollToSection={scrollToSection}
+      {/* Header Navigation */}
+      <HeaderNav
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
+        selectedState={selectedState}
+        onSelectState={setSelectedState}
       />
 
-      {/* Main Sections */}
+      {/* Main Page View Switching */}
       <main className="flex-1">
-        <SurakshaHero
-          onOpenBookModal={(type) => handleOpenBookModal(type)}
-          onScrollToSection={scrollToSection}
-        />
+        {currentPage === 'home' && (
+          <HomeView
+            onNavigate={handleNavigate}
+            onOpenReportModal={() => handleNavigate('download-report')}
+          />
+        )}
 
-        <TestCategories
-          onSelectTestToBook={(testName) => handleOpenBookModal('test', testName)}
-        />
+        {currentPage === 'book-test' && <BookTestView />}
 
-        <TechStrip />
+        {currentPage === 'packages' && (
+          <PackagesView initialFilter={packageFilter} />
+        )}
 
-        <StatsCounter />
+        {currentPage === 'consult-doctor' && (
+          <ConsultDoctorView onSuccessToast={showToast} />
+        )}
 
-        <TestimonialsSection />
+        {currentPage === 'centres' && (
+          <FindCentreView initialState={selectedState} />
+        )}
 
-        <FindCentreSection
-          onOpenBookModal={(type) => handleOpenBookModal(type)}
-        />
+        {currentPage === 'download-report' && <DownloadReportView />}
+
+        {currentPage === 'about' && <AboutView />}
+
+        {currentPage === 'blog' && <BlogView />}
+
+        {currentPage === 'contact' && (
+          <ContactView onSuccessToast={showToast} />
+        )}
       </main>
 
       {/* Footer */}
-      <SurakshaFooter
-        onOpenBookModal={() => handleOpenBookModal('test')}
-        onOpenReportModal={() => setReportModalOpen(true)}
-        onScrollToSection={scrollToSection}
-      />
+      <Footer onNavigate={handleNavigate} />
 
-      {/* Modals & Sticky Overlays */}
-      <BookTestModal
-        isOpen={bookModalOpen}
-        onClose={() => setBookModalOpen(false)}
-        bookingType={bookType}
-        prefilledTest={prefilledTest}
-        onSuccessToast={showToast}
-      />
+      {/* Global Slide-In Cart Drawer */}
+      <CartDrawer />
 
-      <DownloadReportModal
-        isOpen={reportModalOpen}
-        onClose={() => setReportModalOpen(false)}
-        onSuccessToast={showToast}
-      />
-
+      {/* Floating & Sticky Action Widgets */}
+      <CallBackWidget onSuccessToast={showToast} />
       <FloatingWhatsApp />
-
-      <MobileStickyBar
-        onOpenBookModal={(type) => handleOpenBookModal(type)}
-        onOpenReportModal={() => setReportModalOpen(true)}
-      />
+      <MobileStickyBar onNavigate={handleNavigate} />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <CartProvider>
+      <AppContent />
+    </CartProvider>
   );
 };
