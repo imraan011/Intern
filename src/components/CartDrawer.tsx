@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { createBooking } from '../api/client';
 
 export const CartDrawer: React.FC = () => {
   const { cartItems, removeFromCart, clearCart, isCartOpen, setIsCartOpen, totalAmount } = useCart();
@@ -7,24 +8,54 @@ export const CartDrawer: React.FC = () => {
 
   const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
+  const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
-  const [slotDate, setSlotDate] = useState('2026-08-15');
+  const [slotDate, setSlotDate] = useState('2026-08-20');
   const [slotTime, setSlotTime] = useState('08:00 AM - 10:00 AM');
   const [bookingId, setBookingId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isCartOpen) return null;
 
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mockId = 'SRK-' + Math.floor(100000 + Math.random() * 900000);
-    setBookingId(mockId);
-    setStep('confirmation');
-    clearCart();
+    setErrorMsg(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await createBooking({
+        patientName: name,
+        mobile,
+        email,
+        address,
+        scheduledDate: slotDate,
+        timeSlot: slotTime,
+        items: cartItems.map((item) => ({
+          id: item.id,
+          title: item.title,
+          price: item.price,
+          type: item.type,
+          quantity: item.quantity
+        })),
+        totalAmount
+      });
+
+      const confirmedId = response.bookingId || response._id || 'SRK-' + Math.floor(100000 + Math.random() * 900000);
+      setBookingId(confirmedId);
+      setStep('confirmation');
+      clearCart();
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to complete booking. Please check connection.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
     setIsCartOpen(false);
     setStep('cart');
+    setErrorMsg(null);
   };
 
   return (
@@ -98,6 +129,12 @@ export const CartDrawer: React.FC = () => {
 
           {step === 'checkout' && (
             <form onSubmit={handleCheckoutSubmit} className="space-y-4">
+              {errorMsg && (
+                <div className="bg-rose-50 text-rose-700 p-3 rounded-2xl text-xs font-bold border border-rose-200">
+                  ⚠️ {errorMsg}
+                </div>
+              )}
+
               <div className="bg-emerald-50 text-emerald-800 p-3 rounded-2xl text-xs font-bold border border-emerald-200">
                 ⚡ Direct Guest Booking: No login or account required.
               </div>
@@ -126,6 +163,19 @@ export const CartDrawer: React.FC = () => {
                   placeholder="10-digit mobile number"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
+                  className="w-full p-3 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:border-rose-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Email Address (Optional)
+                </label>
+                <input
+                  type="email"
+                  placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full p-3 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:border-rose-600"
                 />
               </div>
@@ -175,9 +225,10 @@ export const CartDrawer: React.FC = () => {
 
               <button
                 type="submit"
-                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-full shadow-lg shadow-rose-600/25 transition-colors mt-2"
+                disabled={isSubmitting}
+                className="w-full bg-rose-600 hover:bg-rose-700 text-white font-extrabold text-xs sm:text-sm py-3.5 rounded-full shadow-lg shadow-rose-600/25 transition-colors mt-2 disabled:opacity-50"
               >
-                Confirm Booking (Pay on Collection)
+                {isSubmitting ? 'Saving to Database...' : 'Confirm Booking (Pay on Collection)'}
               </button>
             </form>
           )}
@@ -189,20 +240,20 @@ export const CartDrawer: React.FC = () => {
               </div>
 
               <div>
-                <h4 className="text-lg font-extrabold text-slate-900">Booking Confirmed!</h4>
+                <h4 className="text-lg font-extrabold text-slate-900">Booking Saved to Database!</h4>
                 <p className="text-xs text-slate-500 mt-1">
                   Reference Booking ID: <strong className="text-rose-600 font-mono">{bookingId}</strong>
                 </p>
               </div>
 
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left text-xs space-y-1.5 font-medium text-slate-700">
-                <p><strong>Phlebotomist Assigned:</strong> Suraksha Express Agent</p>
+                <p><strong>Patient Name:</strong> {name}</p>
                 <p><strong>Scheduled Slot:</strong> {slotDate} ({slotTime})</p>
                 <p><strong>Pickup Address:</strong> {address || 'Home Location'}</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-teal-50 text-teal-800 text-xs font-bold border border-teal-200">
-                🚀 Track your sample status live on Suraksha App using ID {bookingId}.
+                🚀 Saved successfully in MongoDB under Booking ID {bookingId}.
               </div>
 
               <button

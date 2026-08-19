@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap Location
+Sitemap: https://suraksha-care-diagnostics.vercel.app/sitemap.xml
+
+# Crawl delay optimization
+Crawl-delay: 1

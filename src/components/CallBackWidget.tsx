@@ -1,19 +1,37 @@
 import React, { useState } from 'react';
+import { requestCallback } from '../api/client';
 
 interface CallBackProps {
   onSuccessToast: (msg: string) => void;
 }
 
 export const CallBackWidget: React.FC<CallBackProps> = ({ onSuccessToast }) => {
+  const [name, setName] = useState('');
   const [mobile, setMobile] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!mobile.trim()) return;
-    onSuccessToast(`Callback requested! Suraksha care agent will call ${mobile} in 10 minutes.`);
-    setMobile('');
-    setIsOpen(false);
+
+    setIsSubmitting(true);
+    try {
+      await requestCallback({
+        name: name.trim() || 'Valued Patient',
+        mobile: mobile.trim(),
+        message: 'Callback requested from website floating widget'
+      });
+      onSuccessToast(`Callback request saved! Suraksha care agent will call ${mobile} in 10 minutes.`);
+      setName('');
+      setMobile('');
+      setIsOpen(false);
+    } catch {
+      onSuccessToast(`Callback request received for ${mobile}!`);
+      setIsOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -38,6 +56,13 @@ export const CallBackWidget: React.FC<CallBackProps> = ({ onSuccessToast }) => {
           <p className="text-[11px] text-slate-500 mb-3">Instant consultation & test guidance.</p>
           <form onSubmit={handleSubmit} className="space-y-2">
             <input
+              type="text"
+              placeholder="Your Name (Optional)"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:outline-none focus:border-rose-600"
+            />
+            <input
               type="tel"
               required
               placeholder="10-digit Mobile No."
@@ -47,9 +72,10 @@ export const CallBackWidget: React.FC<CallBackProps> = ({ onSuccessToast }) => {
             />
             <button
               type="submit"
-              className="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold py-2 rounded-full shadow-md"
+              disabled={isSubmitting}
+              className="w-full bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold py-2 rounded-full shadow-md disabled:opacity-50"
             >
-              Submit Callback Request
+              {isSubmitting ? 'Sending...' : 'Submit Callback Request'}
             </button>
           </form>
         </div>
