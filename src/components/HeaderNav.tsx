@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { PageView } from '../types/suraksha';
 import { useCart } from '../context/CartContext';
+import { UserProfile } from '../api/client';
 
 interface HeaderNavProps {
   currentPage: PageView;
   onNavigate: (page: PageView) => void;
   selectedState: string;
   onSelectState: (st: string) => void;
+  user?: UserProfile | null;
+  onOpenAuthModal?: () => void;
+  onLogout?: () => void;
 }
 
 export const HeaderNav: React.FC<HeaderNavProps> = ({
@@ -14,6 +18,9 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   onNavigate,
   selectedState,
   onSelectState,
+  user,
+  onOpenAuthModal,
+  onLogout,
 }) => {
   const { setIsCartOpen, totalCount } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -53,7 +60,28 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             <span className="hidden md:inline text-slate-400">Est. 1994 • 30+ Years of Legacy</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            {/* User Session Auth Button */}
+            {user ? (
+              <div className="flex items-center gap-2 bg-slate-800 px-3 py-1 rounded-full text-white font-semibold border border-slate-700">
+                <span className="w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-[10px] font-bold">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+                <span className="truncate max-w-[100px]">{user.name}</span>
+                <button onClick={onLogout} className="text-[10px] text-rose-400 hover:underline">
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={onOpenAuthModal}
+                className="flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-white px-3 py-1 rounded-full text-xs font-bold border border-slate-700 transition-colors"
+              >
+                <span className="material-symbols-outlined text-xs text-rose-500">account_circle</span>
+                <span>Sign In</span>
+              </button>
+            )}
+
             {/* Location Selector Dropdown */}
             <div className="flex items-center gap-1.5 bg-slate-800 px-3 py-1 rounded-full text-slate-200 font-semibold border border-slate-700">
               <span className="material-symbols-outlined text-rose-500 text-xs">location_on</span>

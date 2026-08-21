@@ -138,3 +138,69 @@ export const lookupReport = async (labId?: string, mobile?: string) => {
   }
   return json.data;
 };
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+}
+
+// POST /api/auth/register — Register new patient account
+export const registerUser = async (data: { name: string; email: string; mobile: string; password: string }) => {
+  const res = await fetch(`${API_BASE_URL}/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.error?.message || 'Registration failed');
+  }
+  if (json.data.token) {
+    localStorage.setItem('suraksha_token', json.data.token);
+  }
+  return json.data;
+};
+
+// POST /api/auth/login — Login patient account
+export const loginUser = async (credentials: { email: string; password: string }) => {
+  const res = await fetch(`${API_BASE_URL}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  const json = await res.json();
+  if (!res.ok || !json.success) {
+    throw new Error(json.error?.message || 'Login failed');
+  }
+  if (json.data.token) {
+    localStorage.setItem('suraksha_token', json.data.token);
+  }
+  return json.data;
+};
+
+// GET /api/auth/me — Fetch active session user profile
+export const getCurrentUser = async (): Promise<UserProfile | null> => {
+  const token = localStorage.getItem('suraksha_token');
+  if (!token) return null;
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const json = await res.json();
+    if (res.ok && json.success) {
+      return json.data.user;
+    }
+  } catch {
+    // Ignore network error in fallback
+  }
+  return null;
+};
+
+// Logout active user session
+export const logoutUser = () => {
+  localStorage.removeItem('suraksha_token');
+};
+

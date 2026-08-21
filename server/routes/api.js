@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import crypto from 'crypto';
 import { Test } from '../models/Test.js';
 import { Package } from '../models/Package.js';
 import { Doctor } from '../models/Doctor.js';
@@ -7,12 +7,176 @@ import { Booking } from '../models/Booking.js';
 import { DoctorAppointment } from '../models/DoctorAppointment.js';
 import { CallbackRequest } from '../models/CallbackRequest.js';
 import { Report } from '../models/Report.js';
+import { User } from '../models/User.js';
 
 export const apiRouter = Router();
+
+// Password hashing helper using stdlib crypto
+const hashPassword = (password, salt = crypto.randomBytes(16).toString('hex')) => {
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return { hash, salt };
+};
+
+// In-memory store fallback for development without MongoDB
+const memoryUsers = [];
 
 // Health Check Endpoint
 apiRouter.get('/health', (req, res) => {
   res.json({ success: true, data: { status: 'active', timestamp: new Date().toISOString() } });
+});
+
+// POST /api/auth/register — Register new patient/user
+apiRouter.post('/auth/register', async (req, res, next) => {
+  try {
+    const { name, email, mobile, password } = req.body;
+
+    if (!name || !email || !mobile || !password) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'All fields (name, email, mobile, password) are required.' }
+      });
+    }
+
+    const { hash, salt } = hashPassword(password);
+    const token = 'SRK-TOKEN-' + crypto.randomBytes(24).toString('hex');
+
+    let userObj = null;
+
+    try {
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'User with this email already exists.' }
+        });
+      }
+
+      userObj = new User({
+        name,
+        email: email.toLowerCase(),
+        mobile,
+        passwordHash: hash,
+        salt,
+        token
+      });
+      await userObj.save();
+    } catch {
+      // In-memory fallback if DB unavailable
+      const existing = memoryUsers.find((u) => u.email === email.toLowerCase());
+      if (existing) {
+        return res.status(400).json({
+          success: false,
+          error: { message: 'User with this email already exists.' }
+        });
+      }
+      userObj = { _id: Date.now().toString(), name, email: email.toLowerCase(), mobile, token };
+      memoryUsers.push({ ...userObj, passwordHash: hash, salt });
+    }
+
+    res.status(201).json({
+      success: true,
+      data: {
+        token: userObj.token,
+        user: { id: userObj._id, name: userObj.name, email: userObj.email, mobile: userObj.mobile }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/auth/login — Authenticate patient/user
+apiRouter.post('/auth/login', async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Please provide both email and password.' }
+      });
+    }
+
+    let foundUser = null;
+
+    try {
+      foundUser = await User.findOne({ email: email.toLowerCase() });
+    } catch {
+      foundUser = memoryUsers.find((u) => u.email === email.toLowerCase());
+    }
+
+    if (!foundUser) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid email or password.' }
+      });
+    }
+
+    const { hash } = hashPassword(password, foundUser.salt);
+    if (hash !== foundUser.passwordHash) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Invalid email or password.' }
+      });
+    }
+
+    const token = 'SRK-TOKEN-' + crypto.randomBytes(24).toString('hex');
+    foundUser.token = token;
+
+    try {
+      if (foundUser.save) await foundUser.save();
+    } catch {
+      // memory user updated automatically
+    }
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        user: { id: foundUser._id, name: foundUser.name, email: foundUser.email, mobile: foundUser.mobile }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/auth/me — Fetch active authenticated user profile
+apiRouter.get('/auth/me', async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.replace('Bearer ', '').trim();
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Unauthorized: No token provided.' }
+      });
+    }
+
+    let foundUser = null;
+    try {
+      foundUser = await User.findOne({ token });
+    } catch {
+      foundUser = memoryUsers.find((u) => u.token === token);
+    }
+
+    if (!foundUser) {
+      return res.status(401).json({
+        success: false,
+        error: { message: 'Session expired or invalid token.' }
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user: { id: foundUser._id, name: foundUser.name, email: foundUser.email, mobile: foundUser.mobile }
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/tests — Fetch available pathology/radiology tests

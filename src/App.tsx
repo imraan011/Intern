@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageView } from './types/suraksha';
 import { CartProvider } from './context/CartContext';
 import { HeaderNav } from './components/HeaderNav';
@@ -8,6 +8,8 @@ import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { MobileStickyBar } from './components/MobileStickyBar';
 import { Footer } from './components/Footer';
 import { SEOHead } from './components/SEOHead';
+import { AuthModal } from './components/AuthModal';
+import { getCurrentUser, logoutUser, UserProfile } from './api/client';
 
 // Views
 import { HomeView } from './views/HomeView';
@@ -26,6 +28,14 @@ export const AppContent: React.FC = () => {
   const [selectedState, setSelectedState] = useState<string>('Delhi NCR');
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser().then((userProfile) => {
+      if (userProfile) setUser(userProfile);
+    });
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -36,6 +46,17 @@ export const AppContent: React.FC = () => {
     if (filter) setPackageFilter(filter);
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    setUser(null);
+    showToast('Logged out successfully.');
+  };
+
+  const handleAuthSuccess = (u: UserProfile) => {
+    setUser(u);
+    showToast(`Welcome back, ${u.name}!`);
   };
 
   return (
@@ -57,6 +78,16 @@ export const AppContent: React.FC = () => {
         onNavigate={handleNavigate}
         selectedState={selectedState}
         onSelectState={setSelectedState}
+        user={user}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
+      />
+
+      {/* User Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onSuccess={handleAuthSuccess}
       />
 
       {/* Main Page View Switching */}

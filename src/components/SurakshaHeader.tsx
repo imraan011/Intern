@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
+import { UserProfile } from '../api/client';
 
 interface HeaderProps {
   onOpenBookModal: (type?: 'test' | 'homeCollection') => void;
   onOpenReportModal: () => void;
   onScrollToSection: (sectionId: string) => void;
+  user?: UserProfile | null;
+  onOpenAuthModal?: () => void;
+  onLogout?: () => void;
 }
 
 export const SurakshaHeader: React.FC<HeaderProps> = ({
   onOpenBookModal,
   onOpenReportModal,
   onScrollToSection,
+  user,
+  onOpenAuthModal,
+  onLogout,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -81,6 +88,28 @@ export const SurakshaHeader: React.FC<HeaderProps> = ({
 
         {/* Right CTA Actions */}
         <div className="hidden sm:flex items-center gap-3">
+          {user ? (
+            <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full text-xs font-bold text-slate-800">
+              <span className="w-6 h-6 rounded-full bg-brand-700 text-white flex items-center justify-center text-[10px]">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+              <span>{user.name}</span>
+              <button
+                onClick={onLogout}
+                className="text-[10px] text-rose-600 hover:underline ml-1"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuthModal}
+              className="flex items-center gap-1.5 text-xs font-bold text-white bg-brand-700 hover:bg-brand-800 px-4 py-2 rounded-full transition-colors shadow-sm"
+            >
+              Sign In / Account
+            </button>
+          )}
+
           <a
             href="tel:+911149823000"
             className="flex items-center gap-1.5 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-full transition-colors"
@@ -115,6 +144,33 @@ export const SurakshaHeader: React.FC<HeaderProps> = ({
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="lg:hidden bg-white border-b border-slate-200 p-4 space-y-3">
+          {user ? (
+            <div className="flex items-center justify-between p-3 bg-brand-50 rounded-xl text-xs font-bold text-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="w-7 h-7 rounded-full bg-brand-700 text-white flex items-center justify-center text-xs">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+                <div>
+                  <span className="block leading-tight">{user.name}</span>
+                  <span className="text-[10px] text-slate-500 font-normal">{user.email}</span>
+                </div>
+              </div>
+              <button onClick={onLogout} className="text-xs text-rose-600 hover:underline">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                onOpenAuthModal?.();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-center py-2.5 px-3 text-xs font-bold text-white bg-brand-700 rounded-xl shadow-sm"
+            >
+              Sign In / Create Account
+            </button>
+          )}
+
           <button
             onClick={() => {
               onOpenBookModal('test');
