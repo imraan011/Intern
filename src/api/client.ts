@@ -1,7 +1,7 @@
 import { TESTS_DATA, PACKAGES_DATA, DOCTORS_DATA, CENTRES_DATA } from '../data/mockData';
 import { TestItem, PackageItem, Doctor, Centre } from '../types/suraksha';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api';
 
 // GET /api/tests
 export const fetchTests = async (): Promise<TestItem[]> => {
