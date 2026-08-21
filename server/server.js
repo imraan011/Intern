@@ -2,9 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
+import dns from 'dns';
+import { fileURLToPath } from 'url';
 import { apiRouter } from './routes/api.js';
 
-dotenv.config();
+// Use Google & Cloudflare DNS to bypass local ISP SRV record blocks (Jio/Airtel/Windows DNS)
+try {
+  dns.setServers(['8.8.8.8', '1.1.1.1', '8.8.4.4']);
+  dns.setDefaultResultOrder('ipv4first');
+} catch (err: any) {
+  console.warn('[DNS Setup]', err.message);
+}
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
